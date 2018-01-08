@@ -1,0 +1,6 @@
+---
+title: "Representació de dades"
+output: html_representacio-dades
+---
+
+Cargar dades
