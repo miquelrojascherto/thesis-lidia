@@ -3,4 +3,13 @@ title: "Representació de dades"
 output: html_representacio-dades
 ---
 
-Cargar dades
+Cargar dades adolescent
+```{r}
+dataset <- read_delim("../jobs/table-adolescent.csv",";", escape_double = FALSE, col_types = cols(`mesos ingrés` = col_double()),trim_ws = TRUE)
+```
+
+```{r}
+library(plyr)
+count(dataset,"GènereID")
+```
+
