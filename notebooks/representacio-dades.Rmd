@@ -8,8 +8,65 @@ Cargar dades adolescent
 dataset <- read_delim("../jobs/table-adolescent.csv",";", escape_double = FALSE, col_types = cols(`mesos ingrés` = col_double()),trim_ws = TRUE)
 ```
 
+Cargar llibreries
 ```{r}
+library(plotly)
 library(plyr)
-count(dataset,"GènereID")
 ```
+
+
+Barplot Gènere Adolescents
+```{r}
+counts <- count(dataset,"GènereID")
+counts$GènereID<-c("Masculí","Femení")
+counts$text<-counts$freq
+data <- data.frame(x,y)
+p1 <- plot_ly(counts,x = ~x, y = ~y, 
+  text = y, textposition = 'auto',
+  name = "SF Zoo",
+  type = "bar",
+  marker = list(color = 'rgb(158,202,225)',
+  line = list(color = 'rgb(8,48,107)', width = 1.5)))%>%
+  layout(title = "Gènere Adolescents",
+         xaxis = list(title = "Gènere"),
+         yaxis = list(title = "Nombre"))
+
+```
+
+Barplot Nacionalitat
+```{r}
+counts <- count(dataset,"NacioID")
+x<-c("Espanyola","Països Àrabs","Països de l'Est","No definit")
+y<-counts$freq
+text<-counts$freq
+data <- data.frame(x,y,text)
+p2 <- plot_ly(data,x = ~x, y = ~y, 
+  text = y, textposition = 'auto',
+  name = "SF Zoo",
+  type = "bar",
+  marker = list(color = 'rgb(158,202,225)',
+  line = list(color = 'rgb(8,48,107)', width = 1.5)))%>%
+  layout(title = "Gènere Adolescents",
+         xaxis = list(title = "Nacionalitat"),
+         yaxis = list(title = "Nombre"))
+```
+
+Barplot Edat
+```{r}
+counts <- count(dataset,"EDAT")
+x<-counts$EDAT
+y<-counts$freq
+text<-counts$freq
+data <- data.frame(x,y,text)
+p2 <- plot_ly(data,x = ~x, y = ~y, 
+  text = y, textposition = 'auto',
+  name = "SF Zoo",
+  type = "bar",
+  marker = list(color = 'rgb(158,202,225)',
+  line = list(color = 'rgb(8,48,107)', width = 1.5)))%>%
+  layout(title = "Gènere Adolescents",
+         xaxis = list(title = "Nacionalitat"),
+         yaxis = list(title = "Nombre"))
+```
+
 
