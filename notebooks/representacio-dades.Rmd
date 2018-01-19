@@ -3,26 +3,32 @@ title: "Representació de dades"
 output: html_representacio-dades
 ---
 
-Cargar dades adolescent
-```{r}
-dataset <- read_delim("../jobs/table-adolescent.csv",";", escape_double = FALSE, col_types = cols(`mesos ingrés` = col_double()),trim_ws = TRUE)
-```
-
 Cargar llibreries
 ```{r}
+Sys.setenv("plotly_username"="miquelrojas")
+Sys.setenv("plotly_api_key"="BIRFnnN4M1cO6TcJK6W0")
+library(ggplot2)
 library(plotly)
 library(plyr)
+#library(dplyr)
+library(readr)
+```
+
+Cargar dades adolescent
+```{r}
+dataset <- read.csv("../jobs/table-adolescent.csv",sep=";",header = T,encoding="UTF-8")
 ```
 
 
 Barplot Gènere Adolescents
 ```{r}
 counts <- count(dataset,"GènereID")
-counts$GènereID<-c("Masculí","Femení")
+names(counts)[1]<-"concept"
+counts$concept<-c("Masculí","Femení")
 counts$text<-counts$freq
-data <- data.frame(x,y)
-p1 <- plot_ly(counts,x = ~x, y = ~y, 
-  text = y, textposition = 'auto',
+counts
+p <- plot_ly(counts,x = counts$concept, y = counts$freq, 
+  text = counts$text, textposition = 'auto',
   name = "SF Zoo",
   type = "bar",
   marker = list(color = 'rgb(158,202,225)',
@@ -30,18 +36,22 @@ p1 <- plot_ly(counts,x = ~x, y = ~y,
   layout(title = "Gènere Adolescents",
          xaxis = list(title = "Gènere"),
          yaxis = list(title = "Nombre"))
-
+p
+chart_link = api_create(p, filename="thesis-lidia-histo-GenereID")
+chart_link
 ```
 
 Barplot Nacionalitat
 ```{r}
 counts <- count(dataset,"NacioID")
-x<-c("Espanyola","Països Àrabs","Països de l'Est","No definit")
-y<-counts$freq
-text<-counts$freq
-data <- data.frame(x,y,text)
-p2 <- plot_ly(data,x = ~x, y = ~y, 
-  text = y, textposition = 'auto',
+names(counts)[1]<-"concept"
+counts$concept<-c("Espanyola","Països Àrabs","Països de l'Est","No definit")
+counts$text<-counts$freq
+#The default order will be alphabetized unless specified as below:
+counts$concept <- factor(counts$concept, levels = counts[["concept"]])
+counts
+p <- plot_ly(counts,x = counts$concept, y = counts$freq, 
+  text = counts$text, textposition = 'auto',
   name = "SF Zoo",
   type = "bar",
   marker = list(color = 'rgb(158,202,225)',
@@ -49,24 +59,77 @@ p2 <- plot_ly(data,x = ~x, y = ~y,
   layout(title = "Gènere Adolescents",
          xaxis = list(title = "Nacionalitat"),
          yaxis = list(title = "Nombre"))
+p
+chart_link = api_create(p, filename="thesis-lidia-histo-nacionalitat")
+chart_link
 ```
 
 Barplot Edat
 ```{r}
 counts <- count(dataset,"EDAT")
-x<-counts$EDAT
-y<-counts$freq
-text<-counts$freq
-data <- data.frame(x,y,text)
-p2 <- plot_ly(data,x = ~x, y = ~y, 
-  text = y, textposition = 'auto',
+names(counts)[1]<-"concept"
+counts$text<-counts$freq
+counts
+p <- plot_ly(counts,x = counts$concept, y = counts$freq, 
+  text = counts$text, textposition = 'auto',
   name = "SF Zoo",
   type = "bar",
   marker = list(color = 'rgb(158,202,225)',
   line = list(color = 'rgb(8,48,107)', width = 1.5)))%>%
   layout(title = "Gènere Adolescents",
-         xaxis = list(title = "Nacionalitat"),
+         xaxis = list(title = "Gènere"),
          yaxis = list(title = "Nombre"))
+p
+chart_link = api_create(p, filename="thesis-lidia-histo-edat")
+chart_link
+```
+```{r}
+counts <- count(dataset,vars=c("DxSortID","GènereID"))
+names(counts)[1:2]<-c("Q1","Q2")
+counts
+nunique <- unique(counts$Q1)
+
+b <- c("Gènere masculí","Gènere femení")
+x <- c("TCA","T. Psicòtic","T. Emocions i conducta","T. Depressiu","Autisme","T. Adapatatiu","Fòbies","TOC","TLP","T. Angoixa","TDAH","T. Vincle","T. Dissociatiu i de conversió","T. Hipercinètic Dissocial","Dissocial desafiant","T. Esquizoafectivo","nul","otros trastornos dissociales")
+
+y1 <- c()
+y2 <- c()
+data1 <- NULL
+for(i in 1:length(x)){
+  ya1 <- c()
+  ya2 <- c()
+  data1 <- filter(counts,Q1 == i)
+  nr <- nrow(data1)
+  if(nr == 2){
+    ya1 <- data1$freq[1]
+    ya2 <- data1$freq[2]
+  } else if (nr == 1){
+    
+    if(data1$Q2[1] == 1){
+      ya1 <- data1$freq[1]
+      ya2 <- 0
+    }else{
+      ya1 <- 0
+      ya2 <- data1$freq[1]
+    }
+  } else {
+    ya1 <- 0
+    ya2 <- 0
+  }
+  y1 <- c(y1,ya1)
+  y2 <- c(y2,ya2)
+}
+data <- data.frame(x, y1, y2)
+
+p <- plot_ly(data, x = ~x, y = ~y1, type = 'bar', name = b[1], marker = list(color = 'rgb(49,130,189)')) %>%
+  add_trace(y = ~y2, name = b[2], marker = list(color = 'rgb(204,204,204)')) %>%
+  layout(xaxis = list(title = "", tickangle = -45),
+         yaxis = list(title = ""),
+         margin = list(b = 100),
+         barmode = 'group')
+p
+chart_link = api_create(p, filename="thesis-lidia-histo-diag-x-genere")
+chart_link
 ```
 
 
